@@ -114,6 +114,30 @@ class NaiveBayesClassifier(object):
         
         #add code
         #compute the log likelihood and priors from traing data
+                #compute the log likelihood and priors from traing data
+        #-----------------------#
+        #You need to find the log probabiltiy each label and save them in self.logprior, 
+        #so that self.logprior[-1] will store the value of the log probablity of Negative Sentitment.#
+
+        #You need to find the log probabiltiy of a word being in a class c and save them in self.loglikelihoods, 
+        #so that self.loglikelihoods[-1]["bad"] will store the value of the log probablity of seeing the word "bad" 
+        #in sentence with Negative Sentitment.#
+
+        #Debugging Tips: print the variable self.logprior and 
+        #check if it is storing the the expected log probablity values for that class.#
+        #-----------------------#
+        for c in all_classes:
+            total = sum(training_labels == c)
+            Num = float(total) # change the total number to float for further calcualtion
+            self.logprior[c] = np.log(Num/N_sentences) # calculate logprior
+            #total wrods in one class
+            total_words = 0
+            for vocabulary in self.V:
+                total_words = total_words + self.word_count[c][vocabulary]
+            #use total words to calculate loglikelihoods
+            for vocabulary in self.V:
+                number = self.word_count[c][vocabulary]
+                self.loglikelihoods[c][vocabulary] = np.log((number+1)/(total_words+1*len(self.V)))
 
         
 
@@ -130,7 +154,13 @@ class NaiveBayesClassifier(object):
         # return a dictionary of log probablity for each class for a given test sentence: 
         # i,e, {0: -39.39854137691295, 1: -41.07638511893377, -1: -42.93948478571315}
 
+        for c in self.train_data.keys():
+            label_probability[c] = self.logprior[c]
+            for vocabulary in words:
+                if vocabulary in self.V:
+                    label_probability[c] =label_probability[c]+ self.loglikelihoods[c][vocabulary]
         return label_probability
+
 
 
 if __name__ == '__main__':
